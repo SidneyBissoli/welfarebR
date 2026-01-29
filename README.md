@@ -4,6 +4,8 @@
 # welfarebR
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/SidneyBissoli/welfarebR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SidneyBissoli/welfarebR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 welfarebR provides functions to download and process Brazilian social
@@ -20,7 +22,11 @@ You can install the development version of welfarebR from GitHub:
 
 ``` r
 # install.packages("pak")
-pak::pak("sidneybissoli/welfarebR")
+pak::pak("SidneyBissoli/welfarebR")
+
+# or using remotes
+# install.packages("remotes")
+remotes::install_github("SidneyBissoli/welfarebR")
 ```
 
 ## Usage
@@ -33,11 +39,14 @@ library(welfarebR)
 # list available datasets
 available_censo_suas()
 
-# download CRAS data for 2023
-cras_2023 <- get_censo_suas(year = 2023, questionnaire = "cras")
+# download CRAS data for 2017
+cras_2017 <- get_censo_suas(year = 2017, questionnaire = "cras")
 
 # download only for Sao Paulo state
-cras_sp <- get_censo_suas(year = 2023, questionnaire = "cras", uf = "SP")
+cras_sp <- get_censo_suas(year = 2017, questionnaire = "cras", uf = "SP")
+
+# get variable dictionary
+dict <- dictionary_censo_suas(year = 2017, questionnaire = "cras")
 ```
 
 ### CadUnico
@@ -46,11 +55,11 @@ cras_sp <- get_censo_suas(year = 2023, questionnaire = "cras", uf = "SP")
 # list available years
 available_cadunico()
 
-# download CadUnico sample for 2023
-cad_2023 <- get_cadunico(year = 2023)
+# download CadUnico sample for 2018
+cad_2018 <- get_cadunico(year = 2018)
 
 # download as survey design object (for proper weighted analysis)
-cad_survey <- get_cadunico(year = 2023, as_survey = TRUE)
+cad_survey <- get_cadunico(year = 2018, as_survey = TRUE)
 
 # example: calculate weighted statistics
 library(srvyr)
@@ -77,15 +86,13 @@ clear_welfarebr_cache()
 
 | Dataset    | Description                       | Years     | Source   |
 |------------|-----------------------------------|-----------|----------|
-| Censo SUAS | Census of social assistance units | 2011-2023 | MDS/SAGI |
-| CadUnico   | Unified Registry sample           | 2012-2024 | MDS/SAGI |
+| Censo SUAS | Census of social assistance units | 2011-2017 | MDS/SAGI |
+| CadUnico   | Unified Registry sample           | 2012-2018 | MDS/SAGI |
 
-## Related packages
+## Contributing
 
--   [healthbR](https://github.com/sidneybissoli/healthbR): Brazilian
-    public health data
--   [educabR](https://github.com/sidneybissoli/educabR): Brazilian
-    education data
+Contributions are welcome! Please open an issue or submit a pull request
+on [GitHub](https://github.com/SidneyBissoli/welfarebR).
 
 ## License
 
