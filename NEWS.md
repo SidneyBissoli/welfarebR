@@ -1,14 +1,27 @@
-# welfarebR (development version)
+# welfarebR 0.1.0
 
-## welfarebR 0.0.0.9000
+Initial CRAN release.
+## Censo SUAS
 
-* Initial development version.
-* Added `get_censo_suas()` to download Censo SUAS data (CRAS, CREAS, etc.).
-* Added `available_censo_suas()` to list available Censo SUAS datasets.
+* Added `get_censo_suas()` to download Censo SUAS data (2011-2017).
+* Added `available_censo_suas()` to list available datasets.
 * Added `dictionary_censo_suas()` to get variable descriptions.
-* Added `get_cadunico()` to download CadUnico sample data.
-* Added `available_cadunico()` to list available CadUnico years.
+* Supported questionnaires: CRAS, CREAS, Gestao Municipal, Gestao Estadual, Conselho Municipal, Conselho Estadual, Centro POP, Acolhimento.
+
+## CadUnico
+
+* Added `get_cadunico()` to download CadUnico sample data (2012-2018).
+* Added `available_cadunico()` to list available years.
 * Added `dictionary_cadunico()` to get variable descriptions.
-* Added survey design support via `as_survey` parameter in `get_cadunico()`.
-* Added caching system with `get_cache_dir()`, `set_cache_dir()`, and `clear_welfarebr_cache()`.
-* Support for multiple output formats: tibble, arrow, parquet.
+* Added `sampling_plan_cadunico()` for sampling methodology information.
+* Added survey design support via `as_survey = TRUE` parameter.
+
+## Cache System
+
+* Added `get_cache_dir()` to get current cache directory.
+* Added `set_cache_dir()` to set custom cache directory.
+* Added `clear_welfarebr_cache()` to clear cached data.
+
+## Output Formats
+
+* Support for tibble (default), arrow, and parquet output formats.
