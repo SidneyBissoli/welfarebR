@@ -1,0 +1,277 @@
+---
+title: "Introducao ao welfarebR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introducao ao welfarebR}
+  %\VignetteEngine{knitr::rmarkdown}
+
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+## Visao geral
+
+O pacote `welfarebR` facilita o acesso a dados de assistencia social do Brasil em formato tidy. Atualmente, o pacote oferece acesso a duas fontes principais de dados:
+- **Censo SUAS** (2011-2017): Dados sobre CRAS, CREAS, gestao municipal/estadual e outros equipamentos
+- **CadUnico** (2012-2018): Amostra desidentificada do Cadastro Unico
+
+## Instalacao
+
+```{r installation}
+# Instalacao do GitHub (quando disponivel)
+# remotes::install_github("usuario/welfarebR")
+
+# Carregar o pacote
+library(welfarebR)
+```
+
+## Censo SUAS
+
+### Dados disponiveis
+
+Para ver todos os datasets disponiveis do Censo SUAS:
+
+```{r available-censo}
+library(welfarebR)
+
+# listar datasets disponiveis
+available_censo_suas()
+```
+
+O Censo SUAS inclui os seguintes questionarios:
+
+| Questionario | Descricao |
+|--------------|-----------|
+| `cras` | Centro de Referencia de Assistencia Social |
+| `creas` | Centro de Referencia Especializado de Assistencia Social |
+| `gestao_municipal` | Gestao Municipal do SUAS |
+| `gestao_estadual` | Gestao Estadual do SUAS |
+| `conselho_municipal` | Conselho Municipal de Assistencia Social |
+| `conselho_estadual` | Conselho Estadual de Assistencia Social |
+| `centro_pop` | Centro de Referencia para Populacao em Situacao de Rua |
+| `acolhimento` | Unidades de Acolhimento |
+
+### Baixando dados
+
+Use `get_censo_suas()` para baixar os microdados:
+
+```{r download-censo}
+# baixar dados do CRAS 2017
+cras_2017 <- get_censo_suas(year = 2017, questionnaire = "cras")
+
+# visualizar estrutura
+dplyr::glimpse(cras_2017)
+```
+
+### Filtrando por estado
+
+Voce pode filtrar os dados por UF durante o download:
+
+```{r filter-uf}
+# baixar apenas dados de Sao Paulo
+cras_sp <- get_censo_suas(
+  year = 2017,
+  questionnaire = "cras",
+  uf = "SP"
+)
+
+nrow(cras_sp)
+```
+
+### Dicionario de variaveis
+
+Para entender as variaveis, use o dicionario:
+
+```{r dictionary-censo}
+# obter dicionario do CRAS
+dict_cras <- dictionary_censo_suas(year = 2017, questionnaire = "cras")
+
+# visualizar primeiras variaveis
+head(dict_cras, 10)
+
+# buscar variaveis especificas
+dict_cras |>
+  dplyr::filter(stringr::str_detect(variable, "(?i)recursos"))
+```
+
+### Formatos de saida
+
+O pacote suporta diferentes formatos de saida:
+```{r formats}
+# tibble (padrao)
+dados_tibble <- get_censo_suas(2017, "cras", format = "tibble")
+
+# arrow table (requer pacote arrow)
+dados_arrow <- get_censo_suas(2017, "cras", format = "arrow")
+
+# salvar como parquet (requer pacote arrow)
+caminho_parquet <- get_censo_suas(2017, "cras", format = "parquet")
+```
+
+## CadUnico
+
+### Dados disponiveis
+
+Para ver os anos disponiveis do CadUnico:
+
+```{r available-cad}
+available_cadunico()
+```
+
+### Baixando dados
+
+```{r download-cad}
+# baixar amostra do CadUnico 2018
+cad_2018 <- get_cadunico(year = 2018)
+
+dplyr::glimpse(cad_2018)
+```
+
+### Trabalhando com pesos amostrais
+
+O CadUnico e uma amostra complexa. Para fazer inferencias corretas, use os pesos amostrais:
+
+```{r survey}
+# carregar como objeto de survey design
+cad_survey <- get_cadunico(year = 2018, as_survey = TRUE)
+
+# calcular estatisticas ponderadas com srvyr
+library(srvyr)
+
+cad_survey |>
+  summarise(
+    media_renda = survey_mean(renda_per_capita, na.rm = TRUE),
+    total_familias = survey_total()
+  )
+```
+
+### Plano amostral
+
+Para informacoes sobre a metodologia amostral:
+
+```{r sampling}
+info <- sampling_plan_cadunico()
+print(info$notes)
+```
+
+## Sistema de cache
+
+O pacote usa um sistema de cache para evitar downloads repetidos.
+
+### Gerenciando o cache
+
+```{r cache}
+# ver diretorio de cache atual
+get_cache_dir()
+
+# definir diretorio personalizado
+set_cache_dir("~/meu_cache_welfarebr")
+
+# limpar cache (com confirmacao)
+clear_welfarebr_cache()
+
+# limpar apenas cache do Censo SUAS
+clear_welfarebr_cache(dataset = "censo_suas", ask = FALSE)
+
+# resetar para diretorio padrao
+set_cache_dir(NULL)
+```
+
+### Desabilitando cache
+
+Se voce nao quiser usar o cache:
+
+```{r no-cache}
+dados <- get_censo_suas(2017, "cras", cache = FALSE)
+```
+
+## Exemplo completo: Analise de CRAS
+
+```{r example-cras}
+library(welfarebR)
+library(dplyr)
+library(ggplot2)
+
+# baixar dados do CRAS 2017
+cras <- get_censo_suas(2017, "cras")
+
+# contar CRAS por regiao
+cras_regiao <- cras |>
+  count(regiao, name = "n_cras") |>
+  arrange(desc(n_cras))
+
+print(cras_regiao)
+
+# visualizar distribuicao
+ggplot(cras_regiao, aes(x = reorder(regiao, n_cras), y = n_cras)) +
+
+
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Numero de CRAS por Regiao (2017)",
+    x = "Regiao",
+    y = "Quantidade de CRAS"
+  ) +
+  theme_minimal()
+```
+
+## Exemplo completo: CadUnico com pesos
+
+```{r example-cad}
+library(welfarebR)
+library(srvyr)
+library(dplyr)
+
+# carregar CadUnico como survey
+cad <- get_cadunico(2018, as_survey = TRUE)
+
+# calcular renda media por regiao
+renda_regiao <- cad |>
+  group_by(regiao) |>
+  summarise(
+    renda_media = survey_mean(renda_per_capita, na.rm = TRUE),
+    n = unweighted(n())
+  )
+
+print(renda_regiao)
+```
+
+## Requisitos do sistema
+
+Para arquivos RAR (Censo SUAS 2011-2013), instale o pacote `archive`:
+
+```{r archive}
+install.packages("archive")
+```
+
+Para formatos arrow/parquet:
+
+```{r arrow}
+install.packages("arrow")
+```
+
+Para analises com pesos amostrais:
+
+```{r srvyr}
+install.packages("srvyr")
+```
+
+## Recursos adicionais
+
+- **Documentacao oficial do Censo SUAS**: [SAGI/MDS](https://aplicacoes.mds.gov.br/sagi/)
+- **Dados abertos CadUnico**: [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados/microdados-amostrais-do-cadastro-unico)
+- **Plano amostral CadUnico**: Use `sampling_plan_cadunico()$documentation_url`
+
+## Problemas conhecidos
+
+1. **Arquivos RAR**: Anos 2011-2013 do Censo SUAS usam formato RAR, que requer o pacote `archive`
+2. **Tamanho dos arquivos**: Alguns datasets sao grandes. Use o sistema de cache para evitar downloads repetidos
+3. **Encoding**: Os dados originais usam encoding Latin1. O pacote converte automaticamente para UTF-8
