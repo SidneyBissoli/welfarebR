@@ -2,3 +2,7 @@ inst/doc
 .claude/
 welfarebr_spec.txt
 README.html
+
+# artefatos R
+.Rhistory
+*.tar.gz
