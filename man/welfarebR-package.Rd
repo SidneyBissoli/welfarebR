@@ -11,8 +11,8 @@ Provides functions to download and process Brazilian social assistance data in t
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/sidneybissoli/welfarebR}
-  \item Report bugs at \url{https://github.com/sidneybissoli/welfarebR/issues}
+  \item \url{https://github.com/SidneyBissoli/welfarebR}
+  \item Report bugs at \url{https://github.com/SidneyBissoli/welfarebR/issues}
 }
 
 }
