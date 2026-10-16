@@ -5,3 +5,4 @@
 ^welfarebr_spec\.txt
 ^\.github$
 ^air\.toml$
+^\.git-blame-ignore-revs$
