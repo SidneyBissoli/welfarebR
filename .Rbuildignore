@@ -4,3 +4,4 @@
 ^\.claude$
 ^welfarebr_spec\.txt
 ^\.github$
+^air\.toml$
