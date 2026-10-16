@@ -52,12 +52,13 @@
 #' cad_survey |>
 #'   summarise(mean_income = survey_mean(renda_per_capita))
 #' }
-get_cadunico <- function(year,
-                         as_survey = FALSE,
-                         uf = NULL,
-                         format = "tibble",
-                         cache = TRUE) {
-
+get_cadunico <- function(
+  year,
+  as_survey = FALSE,
+  uf = NULL,
+  format = "tibble",
+  cache = TRUE
+) {
   # validate inputs
   checkmate::assert_integerish(year, len = 1)
   checkmate::assert_flag(as_survey)
@@ -142,7 +143,6 @@ get_cadunico <- function(year,
 #' @examples
 #' available_cadunico()
 available_cadunico <- function() {
-
   # define available datasets (2012-2018)
   tibble::tibble(
     year = .cadunico_years,
@@ -177,7 +177,6 @@ available_cadunico <- function() {
 #' dict <- dictionary_cadunico(2018)
 #' }
 dictionary_cadunico <- function(year) {
-
   # validate inputs
   checkmate::assert_integerish(year, len = 1)
 
@@ -188,7 +187,9 @@ dictionary_cadunico <- function(year) {
 
   # TODO: implement dictionary loading from dados.gov.br
   cli::cli_alert_warning("Dictionary not yet implemented for CadUnico {year}")
-  cli::cli_alert_info("Official dictionary available at: {.url {(.cadunico_dictionary_url)}}")
+  cli::cli_alert_info(
+    "Official dictionary available at: {.url {(.cadunico_dictionary_url)}}"
+  )
 
   # return empty structure for now
   tibble::tibble(
@@ -220,9 +221,12 @@ dictionary_cadunico <- function(year) {
 #' sampling_info <- sampling_plan_cadunico()
 #' sampling_info$url
 sampling_plan_cadunico <- function() {
-
-  cli::cli_alert_info("CadUnico uses a complex sample design with stratification")
-  cli::cli_alert_info("Official sampling plan document: {.url {(.cadunico_sampling_plan_url)}}")
+  cli::cli_alert_info(
+    "CadUnico uses a complex sample design with stratification"
+  )
+  cli::cli_alert_info(
+    "Official sampling plan document: {.url {(.cadunico_sampling_plan_url)}}"
+  )
 
   list(
     description = "Amostra complexa estratificada do Cadastro Unico",
@@ -247,7 +251,6 @@ sampling_plan_cadunico <- function() {
 #'
 #' @keywords internal
 build_cadunico_url <- function(year) {
-
   # validate year
   if (!year %in% .cadunico_years) {
     cli::cli_abort(c(
@@ -275,7 +278,6 @@ build_cadunico_url <- function(year) {
 #'
 #' @keywords internal
 read_cadunico_file <- function(path, year) {
-
   # detect file type
   ext <- tolower(tools::file_ext(path))
 
@@ -327,9 +329,8 @@ read_cadunico_file <- function(path, year) {
 #'
 #' @keywords internal
 create_cadunico_survey <- function(data) {
-
   # check if srvyr is available
- if (!requireNamespace("srvyr", quietly = TRUE)) {
+  if (!requireNamespace("srvyr", quietly = TRUE)) {
     cli::cli_abort(
       "Package {.pkg srvyr} is required for as_survey = TRUE. Install with: install.packages('srvyr')"
     )
@@ -337,7 +338,13 @@ create_cadunico_survey <- function(data) {
 
   # identify weight column
   # common names: peso, peso_amostral, weight, fator_expansao
-  weight_cols <- c("peso", "peso_amostral", "weight", "fator_expansao", "peso_fam")
+  weight_cols <- c(
+    "peso",
+    "peso_amostral",
+    "weight",
+    "fator_expansao",
+    "peso_fam"
+  )
   found_weight <- intersect(names(data), weight_cols)
 
   if (length(found_weight) == 0) {
@@ -372,7 +379,9 @@ create_cadunico_survey <- function(data) {
       )
   } else {
     # simple weighted design
-    cli::cli_alert_info("Creating weighted survey design (no strata/cluster info found)")
+    cli::cli_alert_info(
+      "Creating weighted survey design (no strata/cluster info found)"
+    )
     survey_design <- data |>
       srvyr::as_survey_design(weights = !!rlang::sym(weight_col))
   }

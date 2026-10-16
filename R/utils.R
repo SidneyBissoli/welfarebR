@@ -10,20 +10,17 @@
 #'
 #' @keywords internal
 download_with_progress <- function(url, destfile = NULL, quiet = FALSE) {
-
-
-
   # validate inputs
- checkmate::assert_string(url)
- checkmate::assert_string(destfile, null.ok = TRUE)
+  checkmate::assert_string(url)
+  checkmate::assert_string(destfile, null.ok = TRUE)
   checkmate::assert_flag(quiet)
 
   # set destination
- if (is.null(destfile)) {
+  if (is.null(destfile)) {
     destfile <- tempfile()
   }
 
- # download with httr2
+  # download with httr2
   if (!quiet) {
     cli::cli_alert_info("Downloading from {.url {url}}")
   }
@@ -37,7 +34,7 @@ download_with_progress <- function(url, destfile = NULL, quiet = FALSE) {
 
   if (!quiet) {
     cli::cli_alert_success("Download complete")
- }
+  }
 
   destfile
 }
@@ -53,8 +50,7 @@ download_with_progress <- function(url, destfile = NULL, quiet = FALSE) {
 #'
 #' @keywords internal
 download_chunked <- function(urls, destdir = NULL, quiet = FALSE) {
-
- # validate inputs
+  # validate inputs
   checkmate::assert_character(urls, min.len = 1)
   checkmate::assert_string(destdir, null.ok = TRUE)
   checkmate::assert_flag(quiet)
@@ -96,7 +92,6 @@ download_chunked <- function(urls, destdir = NULL, quiet = FALSE) {
 #'
 #' @keywords internal
 read_with_format <- function(data, format = "tibble") {
-
   # validate inputs
   checkmate::assert_choice(format, c("tibble", "arrow", "parquet"))
 
@@ -138,7 +133,6 @@ read_with_format <- function(data, format = "tibble") {
 #'
 #' @keywords internal
 build_url <- function(base_url, ...) {
-
   # validate inputs
   checkmate::assert_string(base_url)
 
@@ -173,11 +167,12 @@ build_url <- function(base_url, ...) {
 #' @return Invisible TRUE if valid, otherwise throws error.
 #'
 #' @keywords internal
-validate_inputs <- function(year = NULL,
-                            questionnaire = NULL,
-                            valid_years = NULL,
-                            valid_questionnaires = NULL) {
-
+validate_inputs <- function(
+  year = NULL,
+  questionnaire = NULL,
+  valid_years = NULL,
+  valid_questionnaires = NULL
+) {
   if (!is.null(year)) {
     checkmate::assert_integerish(year, lower = 2007, upper = 2100, len = 1)
 

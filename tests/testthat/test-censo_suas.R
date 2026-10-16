@@ -23,8 +23,14 @@ test_that("available_censo_suas includes all questionnaires", {
   questionnaires <- unique(result$questionnaire)
 
   expected <- c(
-    "cras", "creas", "gestao_municipal", "gestao_estadual",
-    "conselho_municipal", "conselho_estadual", "centro_pop", "acolhimento"
+    "cras",
+    "creas",
+    "gestao_municipal",
+    "gestao_estadual",
+    "conselho_municipal",
+    "conselho_estadual",
+    "centro_pop",
+    "acolhimento"
   )
   expect_true(all(expected %in% questionnaires))
 })
@@ -60,7 +66,10 @@ test_that("dictionary_censo_suas loads creas dictionary", {
 
 test_that("dictionary_censo_suas validates year", {
   expect_error(dictionary_censo_suas("2017", "cras"), class = "simpleError")
-  expect_error(dictionary_censo_suas(c(2016, 2017), "cras"), class = "simpleError")
+  expect_error(
+    dictionary_censo_suas(c(2016, 2017), "cras"),
+    class = "simpleError"
+  )
 })
 
 test_that("dictionary_censo_suas validates questionnaire", {
@@ -101,7 +110,10 @@ test_that("build_censo_suas_url returns correct url for 2011", {
 })
 
 test_that("build_censo_suas_url fails for invalid year", {
-  expect_error(welfarebR:::build_censo_suas_url(2020, "cras"), "No URL available")
+  expect_error(
+    welfarebR:::build_censo_suas_url(2020, "cras"),
+    "No URL available"
+  )
 })
 
 
@@ -166,11 +178,17 @@ test_that("get_censo_suas validates questionnaire argument", {
 })
 
 test_that("get_censo_suas validates format argument", {
-  expect_error(get_censo_suas(2017, "cras", format = "invalid"), class = "simpleError")
+  expect_error(
+    get_censo_suas(2017, "cras", format = "invalid"),
+    class = "simpleError"
+  )
 })
 
 test_that("get_censo_suas validates cache argument", {
-  expect_error(get_censo_suas(2017, "cras", cache = "yes"), class = "simpleError")
+  expect_error(
+    get_censo_suas(2017, "cras", cache = "yes"),
+    class = "simpleError"
+  )
 })
 
 test_that("get_censo_suas rejects invalid year", {

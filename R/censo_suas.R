@@ -16,7 +16,7 @@
 .censo_suas_urls <- c(
   "2017" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/microdado/microdado_210.zip",
   "2016" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/microdado/microdado_209.zip",
- "2015" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/pdf/microdados_2015.zip",
+  "2015" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/pdf/microdados_2015.zip",
   "2014" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/pdf/microdados_2014.zip",
   "2013" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/pdf/microdado_137.rar",
   "2012" = "https://aplicacoes.mds.gov.br/sagi/pesquisas/documentos/pdf/microdado_134.rar",
@@ -67,12 +67,13 @@
 #' # return as arrow table
 #' cras_arrow <- get_censo_suas(2017, "cras", format = "arrow")
 #' }
-get_censo_suas <- function(year,
-                           questionnaire,
-                           uf = NULL,
-                           format = "tibble",
-                           cache = TRUE) {
-
+get_censo_suas <- function(
+  year,
+  questionnaire,
+  uf = NULL,
+  format = "tibble",
+  cache = TRUE
+) {
   # validate inputs
   checkmate::assert_integerish(year, len = 1)
   checkmate::assert_string(questionnaire)
@@ -154,7 +155,6 @@ get_censo_suas <- function(year,
 #' @examples
 #' available_censo_suas()
 available_censo_suas <- function() {
-
   # define available datasets
   # microdados sagi: 2011-2017
   tibble::tibble(
@@ -162,12 +162,16 @@ available_censo_suas <- function() {
     questionnaire = rep(.censo_suas_questionnaires, times = 7),
     description = dplyr::case_when(
       questionnaire == "cras" ~ "Centro de Referencia de Assistencia Social",
-      questionnaire == "creas" ~ "Centro de Referencia Especializado de Assistencia Social",
+      questionnaire ==
+        "creas" ~ "Centro de Referencia Especializado de Assistencia Social",
       questionnaire == "gestao_municipal" ~ "Gestao Municipal do SUAS",
       questionnaire == "gestao_estadual" ~ "Gestao Estadual do SUAS",
-      questionnaire == "conselho_municipal" ~ "Conselho Municipal de Assistencia Social",
-      questionnaire == "conselho_estadual" ~ "Conselho Estadual de Assistencia Social",
-      questionnaire == "centro_pop" ~ "Centro de Referencia para Populacao em Situacao de Rua",
+      questionnaire ==
+        "conselho_municipal" ~ "Conselho Municipal de Assistencia Social",
+      questionnaire ==
+        "conselho_estadual" ~ "Conselho Estadual de Assistencia Social",
+      questionnaire ==
+        "centro_pop" ~ "Centro de Referencia para Populacao em Situacao de Rua",
       questionnaire == "acolhimento" ~ "Unidades de Acolhimento",
       TRUE ~ NA_character_
     ),
@@ -196,7 +200,6 @@ available_censo_suas <- function() {
 #' head(dict)
 #' }
 dictionary_censo_suas <- function(year, questionnaire) {
-
   # validate inputs
   checkmate::assert_integerish(year, len = 1)
   checkmate::assert_string(questionnaire)
@@ -214,7 +217,10 @@ dictionary_censo_suas <- function(year, questionnaire) {
   # dictionaries are from 2017 but apply to all years
   dict_file <- stringr::str_c("dict_", questionnaire, "_2017.csv")
   dict_path <- system.file(
-    "extdata", "dictionaries", "censo_suas_2017", dict_file,
+    "extdata",
+    "dictionaries",
+    "censo_suas_2017",
+    dict_file,
     package = "welfarebR"
   )
 
@@ -261,7 +267,6 @@ dictionary_censo_suas <- function(year, questionnaire) {
 #'
 #' @keywords internal
 build_censo_suas_url <- function(year, questionnaire) {
-
   year_char <- as.character(year)
 
   # use url mapping for 2011-2017
@@ -287,7 +292,6 @@ build_censo_suas_url <- function(year, questionnaire) {
 #'
 #' @keywords internal
 read_censo_suas_file <- function(path, year, questionnaire) {
-
   # detect file type
   ext <- tolower(tools::file_ext(path))
 
@@ -327,17 +331,17 @@ read_censo_suas_file <- function(path, year, questionnaire) {
     # find base de dados csv file (not RH, not dicionario)
     data_files <- all_files[
       grepl(folder_pattern, all_files, ignore.case = TRUE) &
-      grepl("Base de dados\\.csv$", all_files, ignore.case = TRUE) &
-      !grepl("_RH_", all_files, ignore.case = TRUE)
+        grepl("Base de dados\\.csv$", all_files, ignore.case = TRUE) &
+        !grepl("_RH_", all_files, ignore.case = TRUE)
     ]
 
     if (length(data_files) == 0) {
       # try alternative patterns
       data_files <- all_files[
         grepl(folder_pattern, all_files, ignore.case = TRUE) &
-        grepl("divulga.*\\.csv$", all_files, ignore.case = TRUE) &
-        !grepl("Dicion", all_files, ignore.case = TRUE) &
-        !grepl("_RH_", all_files, ignore.case = TRUE)
+          grepl("divulga.*\\.csv$", all_files, ignore.case = TRUE) &
+          !grepl("Dicion", all_files, ignore.case = TRUE) &
+          !grepl("_RH_", all_files, ignore.case = TRUE)
       ]
     }
 
@@ -356,9 +360,18 @@ read_censo_suas_file <- function(path, year, questionnaire) {
   # read based on file type
   cli::cli_alert_info("Reading data...")
   data <- if (ext == "csv") {
-    readr::read_csv2(path, show_col_types = FALSE, locale = readr::locale(encoding = "Latin1"))
+    readr::read_csv2(
+      path,
+      show_col_types = FALSE,
+      locale = readr::locale(encoding = "Latin1")
+    )
   } else if (ext == "txt") {
-    readr::read_delim(path, delim = ";", show_col_types = FALSE, locale = readr::locale(encoding = "Latin1"))
+    readr::read_delim(
+      path,
+      delim = ";",
+      show_col_types = FALSE,
+      locale = readr::locale(encoding = "Latin1")
+    )
   } else if (ext %in% c("xlsx", "xls")) {
     if (!requireNamespace("readxl", quietly = TRUE)) {
       cli::cli_abort("Package {.pkg readxl} is required to read Excel files")
@@ -385,7 +398,6 @@ read_censo_suas_file <- function(path, year, questionnaire) {
 #'
 #' @keywords internal
 filter_by_uf <- function(data, uf) {
-
   checkmate::assert_string(uf)
   uf_value <- toupper(uf)
 
@@ -394,7 +406,9 @@ filter_by_uf <- function(data, uf) {
   found_col <- intersect(names(data), uf_cols)
 
   if (length(found_col) == 0) {
-    cli::cli_alert_warning("Could not find UF column. Returning unfiltered data.")
+    cli::cli_alert_warning(
+      "Could not find UF column. Returning unfiltered data."
+    )
     return(data)
   }
 

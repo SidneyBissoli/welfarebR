@@ -16,9 +16,8 @@
 #' @examples
 #' get_cache_dir()
 get_cache_dir <- function() {
-
   # check if custom directory is set
- if (exists("cache_dir", envir = .welfarebr_env)) {
+  if (exists("cache_dir", envir = .welfarebr_env)) {
     return(get("cache_dir", envir = .welfarebr_env))
   }
 
@@ -47,19 +46,20 @@ get_cache_dir <- function() {
 #' set_cache_dir(NULL)
 #' }
 set_cache_dir <- function(path) {
-
   # validate input
   checkmate::assert_string(path, null.ok = TRUE)
 
   # store previous value
- old_path <- get_cache_dir()
+  old_path <- get_cache_dir()
 
   if (is.null(path)) {
     # reset to default
     if (exists("cache_dir", envir = .welfarebr_env)) {
       rm("cache_dir", envir = .welfarebr_env)
     }
-    cli::cli_alert_info("Cache directory reset to default: {.path {get_cache_dir()}}")
+    cli::cli_alert_info(
+      "Cache directory reset to default: {.path {get_cache_dir()}}"
+    )
   } else {
     # set custom path
     assign("cache_dir", path, envir = .welfarebr_env)
@@ -91,7 +91,6 @@ set_cache_dir <- function(path) {
 #' clear_welfarebr_cache(dataset = "censo_suas")
 #' }
 clear_welfarebr_cache <- function(dataset = "all", ask = TRUE) {
-
   # validate inputs
   checkmate::assert_choice(dataset, c("all", "censo_suas", "cadunico"))
   checkmate::assert_flag(ask)
@@ -102,7 +101,7 @@ clear_welfarebr_cache <- function(dataset = "all", ask = TRUE) {
   if (!dir.exists(cache_dir)) {
     cli::cli_alert_info("Cache directory does not exist. Nothing to clear.")
     return(invisible(0))
- }
+  }
 
   # determine which files to delete
   if (dataset == "all") {
@@ -119,7 +118,12 @@ clear_welfarebr_cache <- function(dataset = "all", ask = TRUE) {
   }
 
   # list files
-  files <- list.files(target_dir, pattern = pattern, full.names = TRUE, recursive = TRUE)
+  files <- list.files(
+    target_dir,
+    pattern = pattern,
+    full.names = TRUE,
+    recursive = TRUE
+  )
 
   if (length(files) == 0) {
     cli::cli_alert_info("Cache is empty. Nothing to clear.")
@@ -155,7 +159,6 @@ clear_welfarebr_cache <- function(dataset = "all", ask = TRUE) {
 #'
 #' @keywords internal
 get_cache_path <- function(dataset, ..., ext = "rds") {
-
   checkmate::assert_string(dataset)
   checkmate::assert_string(ext)
 
@@ -180,7 +183,6 @@ get_cache_path <- function(dataset, ..., ext = "rds") {
 #'
 #' @keywords internal
 check_cache <- function(dataset, ...) {
-
   path <- get_cache_path(dataset, ...)
 
   if (file.exists(path)) {
@@ -201,7 +203,6 @@ check_cache <- function(dataset, ...) {
 #'
 #' @keywords internal
 save_to_cache <- function(data, dataset, ...) {
-
   path <- get_cache_path(dataset, ...)
 
   # ensure directory exists
@@ -211,7 +212,7 @@ save_to_cache <- function(data, dataset, ...) {
   }
 
   # save data
- saveRDS(data, path)
+  saveRDS(data, path)
 
   invisible(path)
 }
@@ -225,7 +226,6 @@ save_to_cache <- function(data, dataset, ...) {
 #'
 #' @keywords internal
 load_from_cache <- function(path) {
-
   checkmate::assert_file_exists(path)
 
   readRDS(path)
