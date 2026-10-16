@@ -115,7 +115,10 @@ test_that("clear_welfarebr_cache clears specific dataset", {
   save_to_cache(test_data, "cadunico", "2018")
 
   # clear only censo_suas
-  result <- suppressMessages(clear_welfarebr_cache(dataset = "censo_suas", ask = FALSE))
+  result <- suppressMessages(clear_welfarebr_cache(
+    dataset = "censo_suas",
+    ask = FALSE
+  ))
   expect_equal(result, 1)
 
   # cadunico should still exist
